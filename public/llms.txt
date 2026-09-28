@@ -1,0 +1,16 @@
+# AtoA Resolver (resolver.une.education)
+> Deterministic Logic and Constraint Satisfaction Engine for Cross-Border Regulatory Compliance.
+
+## Overview
+AtoA Resolver is an operational compute layer sitting on top of legal repositories (legal.une.education) and customs nomenclatures (customs.une.education). It eliminates LLM hallucinations in international trade operations through deterministic directed acyclic graph (DAG) constraint propagation.
+
+## Interfaces
+- **MCP Endpoint (JSON-RPC 2.0)**: `https://resolver.une.education/mcp.php`
+- **REST Synchronous Endpoint**: `POST https://resolver.une.education/v1/resolve`
+- **OpenAPI Schema**: `https://resolver.une.education/openapi.json`
+- **Smithery Specification**: `https://resolver.une.education/smithery.yaml`
+
+## Core Capabilities
+1. Official TARIC nomenclature verification.
+2. Automated entities and sanctions screening against US Title 15/31 CFR (EAR / OFAC).
+3. Conflict arbitration and missing documentation calculation in under 100 milliseconds.

@@ -1,0 +1,36 @@
+server:
+  name: atoa-resolver
+  description: Deterministic trade compliance, sanctions, and export control resolver node.
+  version: 1.0.0
+entrypoint:
+  type: http
+  url: https://resolver.une.education/mcp.php
+tools:
+  - name: resolve_compliance
+    description: Formally arbitrate cross-border trade compliance, dual-use export controls, and international sanctions without hallucinations.
+    parameters:
+      type: object
+      properties:
+        origin:
+          type: string
+          description: Two-letter ISO country code of origin (e.g., CN, US)
+        destination:
+          type: string
+          description: Two-letter ISO country code of destination (e.g., FR, DE)
+        hs_code:
+          type: string
+          description: Harmonized System (HS) or EU TARIC code (e.g., 8542.31)
+        entities:
+          type: array
+          items:
+            type: string
+          description: Parties involved (transporters, manufacturers, buyers) for automated screening
+        facts:
+          type: array
+          items:
+            type: string
+          description: Verified documentation or states (e.g., DOC_END_USER_STATEMENT)
+      required:
+        - origin
+        - destination
+        - hs_code
