@@ -22,7 +22,11 @@ class McpHandler {
                     'id' => $id,
                     'result' => [
                         'protocolVersion' => '2024-11-05',
-                        'capabilities' => ['tools' => new \stdClass()],
+                        'capabilities' => [
+                            'tools' => new \stdClass(),
+                            'resources' => new \stdClass(),
+                            'prompts' => new \stdClass()
+                        ],
                         'serverInfo' => [
                             'name' => 'atoa-resolver',
                             'version' => '1.0.0'
@@ -57,18 +61,36 @@ class McpHandler {
                                         'entities' => [
                                             'type' => 'array',
                                             'items' => ['type' => 'string'],
-                                            'description' => 'Noms des entités impliquées (fournisseurs, transitaires, acheteurs) pour vérification automatique contre les sanctions'
+                                            'description' => 'Noms des entités impliquées pour criblage sanctions'
                                         ],
                                         'facts' => [
                                             'type' => 'array',
                                             'items' => ['type' => 'string'],
-                                            'description' => 'Faits ou documents déjà réunis (ex: ["DOC_END_USER_STATEMENT"])'
+                                            'description' => 'Faits ou documents déjà réunis'
                                         ]
                                     ],
                                     'required' => ['origin', 'destination', 'hs_code']
                                 ]
                             ]
                         ]
+                    ]
+                ];
+
+            case 'resources/list':
+                return [
+                    'jsonrpc' => '2.0',
+                    'id' => $id,
+                    'result' => [
+                        'resources' => []
+                    ]
+                ];
+
+            case 'prompts/list':
+                return [
+                    'jsonrpc' => '2.0',
+                    'id' => $id,
+                    'result' => [
+                        'prompts' => []
                     ]
                 ];
 

@@ -5,6 +5,9 @@ server:
 entrypoint:
   type: http
   url: https://resolver.une.education/mcp.php
+configSchema:
+  type: object
+  properties: {}
 tools:
   - name: resolve_compliance
     description: Formally arbitrate cross-border trade compliance, dual-use export controls, and international sanctions without hallucinations.
@@ -24,12 +27,12 @@ tools:
           type: array
           items:
             type: string
-          description: Parties involved (transporters, manufacturers, buyers) for automated screening
+          description: Parties involved for automated screening
         facts:
           type: array
           items:
             type: string
-          description: Verified documentation or states (e.g., DOC_END_USER_STATEMENT)
+          description: Verified documentation or states
       required:
         - origin
         - destination
