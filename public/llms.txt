@@ -14,3 +14,5 @@ AtoA Resolver is an operational compute layer sitting on top of legal repositori
 1. Official TARIC nomenclature verification.
 2. Automated entities and sanctions screening against US Title 15/31 CFR (EAR / OFAC).
 3. Conflict arbitration and missing documentation calculation in under 100 milliseconds.
+
+- trade_arbitration_pipeline: Orchestrates full cross-border trade arbitration combining TARIC customs liquidation, OFAC/EU sanctions screening, and Sino-French dispute rules (PRC Art. 621, CISG, French Civil Code).

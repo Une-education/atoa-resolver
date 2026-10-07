@@ -1,73 +1,133 @@
 {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "AtoA Resolver Compliance API",
-    "description": "Deterministic inference and constraint satisfaction engine for customs and cross-border trade compliance.",
-    "version": "1.0.0",
-    "contact": {
-      "name": "AtoA Resolver",
-      "url": "https://resolver.une.education"
-    }
-  },
-  "servers": [
-    {
-      "url": "https://resolver.une.education",
-      "description": "Production compute node"
-    }
-  ],
-  "paths": {
-    "/v1/resolve": {
-      "post": {
-        "summary": "Resolve trade compliance constraints",
-        "operationId": "resolveCompliance",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["origin", "destination", "hs_code"],
-                "properties": {
-                  "origin": { "type": "string", "example": "CN" },
-                  "destination": { "type": "string", "example": "FR" },
-                  "hs_code": { "type": "string", "example": "8542.31" },
-                  "entities": {
-                    "type": "array",
-                    "items": { "type": "string" },
-                    "example": ["Standard Shipping LLC"]
-                  },
-                  "facts": {
-                    "type": "array",
-                    "items": { "type": "string" },
-                    "example": ["DOC_END_USER_STATEMENT"]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Deterministic resolution output",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": { "type": "string", "enum": ["COMPLIANT", "BLOCKED", "CONDITIONAL_MISSING_DOCS"] },
-                    "hs_classification": { "type": "object" },
-                    "entities_screened": { "type": "object" },
-                    "rules_triggered": { "type": "array", "items": { "type": "string" } },
-                    "missing_requirements": { "type": "array", "items": { "type": "string" } },
-                    "conflicts": { "type": "array", "items": { "type": "object" } },
-                    "computation_time_ms": { "type": "number" }
-                  }
-                }
-              }
-            }
-          }
+    "openapi": "3.0.3",
+    "info": {
+        "title": "AtoA Resolver Compliance API",
+        "description": "Deterministic inference and constraint satisfaction engine for customs and cross-border trade compliance.",
+        "version": "1.0.0",
+        "contact": {
+            "name": "AtoA Resolver",
+            "url": "https://resolver.une.education"
         }
-      }
+    },
+    "servers": [
+        {
+            "url": "https://resolver.une.education",
+            "description": "Production compute node"
+        }
+    ],
+    "paths": {
+        "/v1/resolve": {
+            "post": {
+                "summary": "Resolve trade compliance constraints",
+                "operationId": "resolveCompliance",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "origin",
+                                    "destination",
+                                    "hs_code"
+                                ],
+                                "properties": {
+                                    "origin": {
+                                        "type": "string",
+                                        "example": "CN"
+                                    },
+                                    "destination": {
+                                        "type": "string",
+                                        "example": "FR"
+                                    },
+                                    "hs_code": {
+                                        "type": "string",
+                                        "example": "8542.31"
+                                    },
+                                    "entities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Standard Shipping LLC"
+                                        ]
+                                    },
+                                    "facts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "DOC_END_USER_STATEMENT"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Deterministic resolution output",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "COMPLIANT",
+                                                "BLOCKED",
+                                                "CONDITIONAL_MISSING_DOCS"
+                                            ]
+                                        },
+                                        "hs_classification": {
+                                            "type": "object"
+                                        },
+                                        "entities_screened": {
+                                            "type": "object"
+                                        },
+                                        "rules_triggered": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "missing_requirements": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "conflicts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "computation_time_ms": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/trade-arbitration": {
+            "post": {
+                "summary": "Composite trade arbitration pipeline (Customs + Sanctions + Sino/FR Bilateral Dispute)",
+                "operationId": "tradeArbitrationPipeline",
+                "responses": {
+                    "200": {
+                        "description": "Consolidated arbitration report with customs liquidation and legal findings."
+                    }
+                }
+            }
+        }
     }
-  }
 }

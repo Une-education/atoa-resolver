@@ -177,4 +177,105 @@ class ConstraintGraph {
             'computation_time_ms' => round((microtime(true) - $startTime) * 1000, 3)
         ];
     }
+
+    /**
+     * Pipeline composite d'arbitrage commercial international (AtoA Meta-Resolver)
+     */
+    public function arbitrateTrade(array $payload): array {
+        $origin = strtoupper(trim($payload['origin'] ?? 'CN'));
+        $dest = strtoupper(trim($payload['destination'] ?? 'FR'));
+        $rawHs = trim($payload['hs_code'] ?? '');
+        $customsValue = max(0.0, (float)($payload['customs_value_eur'] ?? 0));
+        $defectDiscoveredDate = $payload['defect_discovered_date'] ?? null;
+        $deliveryDate = $payload['delivery_date'] ?? null;
+        $entities = $payload['entities'] ?? [];
+
+        // 1. Classification TARIC & Droits de douane
+        $nomenclature = $this->lookupHsCode($rawHs);
+        $duties = null;
+        if ($this->taricPdo && $customsValue > 0) {
+            $cleanHs = preg_replace('/[^0-9]/', '', $rawHs);
+            $sh6 = substr($cleanHs, 0, 6);
+            $sh4 = substr($cleanHs, 0, 4);
+            $sh2 = substr($cleanHs, 0, 2);
+
+            $stmtRate = $this->taricPdo->prepare("
+                SELECT code_prefix, description, standard_rate, vat_rate, legal_basis
+                FROM customs_duty_rates
+                WHERE code_prefix IN (?, ?, ?)
+                ORDER BY length(code_prefix) DESC LIMIT 1
+            ");
+            $stmtRate->execute([$sh6, $sh4, $sh2]);
+            $rateData = $stmtRate->fetch(PDO::FETCH_ASSOC);
+
+            $dutyRate = $rateData ? (float)$rateData['standard_rate'] : 3.5;
+            $vatRate = $rateData ? (float)$rateData['vat_rate'] : 20.0;
+            $dutyAmount = round($customsValue * ($dutyRate / 100), 2);
+            $vatBase = round($customsValue + $dutyAmount, 2);
+            $vatAmount = round($vatBase * ($vatRate / 100), 2);
+
+            $duties = [
+                'customs_value_eur' => $customsValue,
+                'duty_rate_percent' => $dutyRate,
+                'duty_amount_eur' => $dutyAmount,
+                'vat_taxable_base_eur' => $vatBase,
+                'vat_amount_eur' => $vatAmount,
+                'total_taxes_eur' => round($dutyAmount + $vatAmount, 2),
+                'legal_basis' => $rateData['legal_basis'] ?? 'EU Common Customs Tariff'
+            ];
+        }
+
+        // 2. Criblage sanctions internationales (OFAC / UE)
+        $sanctions = $this->scanEntities($entities);
+        $hasSanctions = !empty($sanctions);
+
+        // 3. Analyse des délais légaux et forclusion (Sino / CISG / FR)
+        $proceduralStatus = 'COMPLIANT';
+        $legalNotes = [];
+
+        if ($deliveryDate && $defectDiscoveredDate) {
+            $delivTs = strtotime($deliveryDate);
+            $defectTs = strtotime($defectDiscoveredDate);
+            $daysDiff = (int)round(($defectTs - $delivTs) / 86400);
+
+            if ($origin === 'CN') {
+                if ($daysDiff > 730) {
+                    $proceduralStatus = 'FORCLOSED';
+                    $legalNotes[] = 'Action forclose sous PRC Civil Code Art. 621 (délai butoir absolu de 2 ans dépassé).';
+                } elseif ($daysDiff > 30) {
+                    $legalNotes[] = 'Alerte CVIM/CISG Art. 39 : Risque de contestation sur le délai raisonnable d\'inspection.';
+                } else {
+                    $legalNotes[] = 'Notification conforme aux délais d\'inspection commerciale bilatérale.';
+                }
+            }
+
+            if ($dest === 'FR') {
+                $legalNotes[] = 'Sous réserve de conformité DGCCRF et garantie légale des vices cachés (Art. 1641 Code civil, 2 ans à compter de la découverte).';
+            }
+        }
+
+        // 4. Détermination de la juridiction et loi applicable
+        $applicableLaw = ($origin === 'CN' && $dest === 'FR') 
+            ? 'Convention de Vienne (CVIM/CISG) - Droit supplétif chinois ou français selon clause attributive'
+            : 'Règlement Rome I (UE) / Droit local du lieu de livraison';
+
+        return [
+            'pipeline_status' => $hasSanctions ? 'BLOCKED_SANCTION_RISK' : 'ARBITRATION_READY',
+            'trade_axis' => "{$origin} -> {$dest}",
+            'customs_and_tariff' => [
+                'nomenclature' => $nomenclature,
+                'liquidation' => $duties
+            ],
+            'compliance_and_sanctions' => [
+                'entities_screened' => count($entities),
+                'sanctions_detected' => $hasSanctions,
+                'matches' => $sanctions
+            ],
+            'dispute_analysis' => [
+                'procedural_status' => $proceduralStatus,
+                'applicable_framework' => $applicableLaw,
+                'legal_findings' => $legalNotes
+            ]
+        ];
+    }
 }
