@@ -1,24 +1,18 @@
 {
-  "$schema": "https://json.schemastore.org/mcp-server-schema.json",
-  "name": "atoa-resolver",
-  "title": "AtoA Resolver - Deterministic Cross-Border Compliance Engine",
-  "description": "Deterministic logic & constraint satisfaction engine (DAG/CSP) preventing LLM hallucinations in international trade, sanctions (OFAC/EAR), and customs compliance.",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Une-education/atoa-resolver",
+  "title": "AtoA Sanctions & Compliance Resolver",
+  "description": "Deterministic trade compliance, sanctions and export control resolver engine (UNE Node 01).",
   "version": "1.0.0",
-  "author": {
-    "name": "une.education",
-    "url": "https://une.education"
-  },
-  "homepage": "https://resolver.une.education",
+  "websiteUrl": "https://resolver.une.education",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/votre-orga/atoa-resolver"
+    "url": "https://github.com/Une-education/atoa-resolver.git",
+    "source": "github"
   },
-  "license": "Apache-2.0",
-  "capabilities": {
-    "tools": true
-  },
-  "endpoints": {
-    "http": "https://resolver.une.education/mcp.php",
-    "rest": "https://resolver.une.education/v1/resolve"
-  }
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://resolver.une.education/mcp.php"
+    }
+  ]
 }
