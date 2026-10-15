@@ -1,18 +1,6 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.Une-education/atoa-resolver",
-  "title": "AtoA Sanctions & Compliance Resolver",
-  "description": "Deterministic trade compliance, sanctions and export control resolver engine (UNE Node 01).",
+  "name": "us-sanctions-resolver",
   "version": "1.0.0",
-  "websiteUrl": "https://resolver.une.education",
-  "repository": {
-    "url": "https://github.com/Une-education/atoa-resolver.git",
-    "source": "github"
-  },
-  "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://resolver.une.education/mcp.php"
-    }
-  ]
+  "description": "Deterministic US Trade & Sanctions Engine: OFAC Title 31 asset controls, BIS Title 15 EAR export screening, and eCFR statutory compliance.",
+  "endpoint": "https://resolver.une.education/mcp.php"
 }
